@@ -1,4 +1,6 @@
 import Veterinario from "../models/Veterinario.js"
+import sendMailToUser from "../config/nodemailer.js"
+
 //metodo para el login
 const login =(req,res)=>{
     res.status(200).json({res:'login del veterinario'})
@@ -8,23 +10,21 @@ const perfil=(req,res)=>{
     res.status(200).json({res:'perfil del veterinario'})
 }
 //Metodo para registro
+
 const registro = async (req,res)=>{
-    //desestructurar los campos
     const {email,password} = req.body
-    // Validar todos los campos llenos
     if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
-    // Obtener el usuario de la BDD en base al email
     const verificarEmailBDD = await Veterinario.findOne({email})
-    //validar que el email sea nuevo
     if(verificarEmailBDD) return res.status(400).json({msg:"Lo sentimos, el email ya se encuentra registrado"})
-    // crear la instancia del veterinario
     const nuevoVeterinario = new Veterinario(req.body)
     nuevoVeterinario.password = await nuevoVeterinario.encrypPassword(password)
-    nuevoVeterinario.crearToken()
-    
+
+    const token = nuevoVeterinario.crearToken()
+    await sendMailToUser(email,token)
     await nuevoVeterinario.save()
-    res.status(200).json({nuevoVeterinario})
+    res.status(200).json({msg:"Revisa tu correo electrónico para confirmar tu cuenta"})
 }
+
 //metodo para confirmar token
 const confirmEmail = (req,res)=>{
     res.status(200).json({res:'confirmar email de registro de veterinario'})
