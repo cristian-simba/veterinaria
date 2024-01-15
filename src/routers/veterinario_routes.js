@@ -1,5 +1,6 @@
 import {Router} from 'express'
 import verificarAutenticacion from '../middlewares/autenticacion.js'
+import { validacionVeterinario } from '../middlewares/validacionVeterinario.js';
 
 const router = Router()
 import {
@@ -28,6 +29,6 @@ router.get('/perfil',verificarAutenticacion,perfil)
 router.put('/veterinario/actualizarpassword',verificarAutenticacion,actualizarPassword)
 router.get('/veterinario/:id',verificarAutenticacion,detalleVeterinario)
 router.put('/veterinario/:id',verificarAutenticacion,actualizarPerfil)
-
+router.post('/registro',validacionVeterinario,registro)
 
 export default router
